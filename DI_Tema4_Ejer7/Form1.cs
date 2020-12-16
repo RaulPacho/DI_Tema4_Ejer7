@@ -125,5 +125,10 @@ namespace DI_Tema4_Ejer7
             ajusteDeLíneaToolStripMenuItem.Checked = !ajusteDeLíneaToolStripMenuItem.Checked;
             textBox1.WordWrap = ajusteDeLíneaToolStripMenuItem.Checked;
         }
+
+        private void normalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToolStripItemCollection tsic = seleccionarTodoToolStripMenuItem.DropDownItems;
+        }
     }
 }
