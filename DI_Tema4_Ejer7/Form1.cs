@@ -14,7 +14,10 @@ namespace DI_Tema4_Ejer7
     public delegate void Metodos();
     public partial class Form1 : Form
     {
-        
+        int palabras=0, frases=0,caracteres = 0;
+        bool hayPalabra = false;
+        bool hayFrase = false;
+        ToolTip tt = new ToolTip();
         public Form1()
         {
             InitializeComponent();
@@ -29,7 +32,15 @@ namespace DI_Tema4_Ejer7
             cortarToolStripMenuItem.Tag = me;
             me = textBox1.SelectAll;
             seleccionarTodoToolStripMenuItem.Tag = me;
-            
+
+            acercaDeToolStripMenuItem.Click += (object sender, EventArgs e) =>
+            {
+                MessageBox.Show("EL autor del programa ha sufrido innumerables brotes psicóticos durante la codificación del mismo, por favor, si lo ven avisen a las autoridades y ponganse a salvo, puede ser peligroso.", "Acerca de...");
+            };
+
+            this.KeyPreview = true;
+
+            tt.SetToolTip(this.textBox1, "c: " + caracteres +", p: " + palabras + ", f: " + frases);
         }
 
         public bool SeBorra()
@@ -128,7 +139,73 @@ namespace DI_Tema4_Ejer7
 
         private void normalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ToolStripItemCollection tsic = seleccionarTodoToolStripMenuItem.DropDownItems;
+            ToolStripItemCollection tsic = selecciónDeEscrituraToolStripMenuItem.DropDownItems;
+            foreach(ToolStripMenuItem tsi in tsic)
+            {
+                if (tsi.Checked)
+                {
+                    tsi.Checked = false;
+                }
+            }
+            ((ToolStripMenuItem)sender).Checked = true;
+
+            switch (((ToolStripMenuItem)sender).Text)
+            {
+                case "Mayúsculas":
+                    textBox1.CharacterCasing = CharacterCasing.Upper;
+                    break;
+                case "Minúsculas":
+                    textBox1.CharacterCasing = CharacterCasing.Lower;
+                    break;
+                case "Normal":
+                    textBox1.CharacterCasing = CharacterCasing.Normal;
+                    break;
+
+            }
+            
+        }
+
+        private void fuenteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FontDialog fd = new FontDialog();
+            DialogResult res = new DialogResult();
+
+            res = fd.ShowDialog();
+            if(res == DialogResult.OK)
+            {
+                textBox1.Font = fd.Font;
+            }
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            
+            
+            tt.SetToolTip(this.textBox1, "c: " + caracteres + ", p: " + palabras + ", f: " + frases);
+        }
+
+        private void colorDeFondoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ColorDialog cd = new ColorDialog();
+
+            DialogResult res = new DialogResult();
+            res = cd.ShowDialog();
+            if(res == DialogResult.OK)
+            {
+                if(((ToolStripMenuItem)sender) == colorDeFondoToolStripMenuItem)
+                {
+                    textBox1.BackColor = cd.Color;
+                }
+                else
+                {
+                    textBox1.ForeColor = cd.Color;
+                }
+            }
+        }
+
+        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
         }
     }
 }
