@@ -8,21 +8,10 @@ using System.Windows.Forms;
 
 namespace DI_Tema4_Ejer7
 {
+    [Serializable]
     class Configuracion
     {
-        /*
-                   bw.Write(ajusteDeLíneaToolStripMenuItem.Checked);
-                   bw.Write(""+textBox1.CharacterCasing);
-                   bw.Write(textBox1.BackColor + "," +textBox1.ForeColor);
-                   bw.Write(""+textBox1.Font);
-                   bw.Write(ultimoDir);
-                   String aux = "";
-                   for(int i = 0; i < recientes.Count; i++)
-                   {
-                       aux += recientes[i] + ",";
-                   }
-                   bw.Write(aux);
-                   */
+       
         public Boolean checkeado;
         public CharacterCasing cc;
         public Color bc;

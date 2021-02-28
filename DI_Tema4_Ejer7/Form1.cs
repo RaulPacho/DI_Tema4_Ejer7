@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,12 +55,13 @@ namespace DI_Tema4_Ejer7
                 textBox1.BackColor = c.bc;
                 textBox1.ForeColor = c.fc;
                 textBox1.CharacterCasing = c.cc;
+                volverAMarcar();
                 textBox1.Font = c.f;
                 ajusteDeLíneaToolStripMenuItem.Checked = c.checkeado;
                 textBox1.WordWrap = c.checkeado;
-                ultimoDir = c.ultimo;
+                ultimoDir = "";
                 recientes = c.recientes;
-
+                rellenaRecientes();
             }
                 tt.SetToolTip(this.textBox1, "caracteres: " + 0 + ", palabras: " + 0 + ", frases: " + 0);
         }
@@ -112,11 +114,14 @@ namespace DI_Tema4_Ejer7
 
         public void rellenaRecientes()
         {
-            if (recientes.Count() == 5)
+            if (ultimoDir != "")
             {
-                recientes.RemoveAt(0);
+                if (recientes.Count() == 5)
+                {
+                    recientes.RemoveAt(0);
+                }
+                recientes.Add(ultimoDir);
             }
-            recientes.Add(ultimoDir);
 
             ToolStripItemCollection items = recientesToolStripMenuItem.DropDownItems;
             for (int i = 0; i < recientes.Count;i++) {
@@ -157,28 +162,17 @@ namespace DI_Tema4_Ejer7
             }
 
         }
-
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            
+            
+            base.OnClosing(e);
+        }
         private void salirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (SeBorra())
             {
-                Configuracion c = new Configuracion();
-                c.bc = textBox1.BackColor;
-                c.fc = textBox1.ForeColor;
-                c.cc = textBox1.CharacterCasing;
-                c.f = textBox1.Font;
-                c.checkeado = ajusteDeLíneaToolStripMenuItem.Checked;
-                c.ultimo = ultimoDir;
-                c.recientes = recientes;
-
-
-                BinaryFormatter bf = new BinaryFormatter();
-
-                FileStream archivo = File.OpenWrite("Conf.cfg");
-
-                bf.Serialize(archivo, c);
-                archivo.Close();
-                Console.ReadLine();
+               
                 Close();
             }
         }
@@ -225,6 +219,29 @@ namespace DI_Tema4_Ejer7
 
         }
 
+        public void volverAMarcar()
+        {
+            ToolStripItemCollection tsic = selecciónDeEscrituraToolStripMenuItem.DropDownItems;
+            foreach (ToolStripMenuItem tsi in tsic)
+            {
+                if (tsi.Checked)
+                {
+                    tsi.Checked = false;
+                }
+            }
+            switch (textBox1.CharacterCasing)
+            {
+                case CharacterCasing.Normal:
+                    ((ToolStripMenuItem)tsic[2]).Checked = true;
+                    break;
+                case CharacterCasing.Upper:
+                    ((ToolStripMenuItem)tsic[0]).Checked = true;
+                    break;
+                case CharacterCasing.Lower:
+                    ((ToolStripMenuItem)tsic[1]).Checked = true;
+                    break;
+            }
+        }
         private void fuenteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FontDialog fd = new FontDialog();
@@ -237,6 +254,34 @@ namespace DI_Tema4_Ejer7
             }
         }
 
+        private void muestraSeleccion()
+        {
+            Form3 f3 = new Form3();
+            f3.textBox1.Text = textBox1.SelectionStart +"";
+            f3.textBox2.Text = textBox1.SelectionLength + "";
+
+            f3.button1.Click += (sender, EventArgs) =>
+            {
+                try
+                {
+                    if (int.Parse(f3.textBox1.Text) < textBox1.Text.Length-1 && int.Parse(f3.textBox1.Text) >= 0 && int.Parse(f3.textBox2.Text) < textBox1.Text.Length-1 && int.Parse(f3.textBox2.Text) >= 0)
+                    {
+                        this.textBox1.SelectionStart = int.Parse(f3.textBox1.Text);
+                        this.textBox1.SelectionLength = int.Parse(f3.textBox2.Text);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Parámetros no válidos... \n ... \n... ejempayasoejem");
+                    }
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show("No se que metiste, pero dos numeros no eran...");
+                }
+                f3.Close();
+            };
+            f3.Show();
+            }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             contLetra = 0;
@@ -306,6 +351,17 @@ namespace DI_Tema4_Ejer7
 
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            
+
+        }
+
+        private void infromacónDeSelecciónToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            muestraSeleccion();
+        }
+
         private void Form1_KeyPress(object sender, KeyPressEventArgs e)
         {
             
@@ -315,6 +371,23 @@ namespace DI_Tema4_Ejer7
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             e.Cancel = !SeBorra();
+            if(SeBorra()){
+                Configuracion c = new Configuracion();
+                c.bc = textBox1.BackColor;
+                c.fc = textBox1.ForeColor;
+                c.cc = textBox1.CharacterCasing;
+                c.f = textBox1.Font;
+                c.checkeado = ajusteDeLíneaToolStripMenuItem.Checked;
+                c.ultimo = ultimoDir;
+                c.recientes = recientes;
+
+
+                FileStream archivo = new FileStream("Conf.cfg", FileMode.Create);
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(archivo, c);
+                archivo.Close();
+                Console.ReadLine();
+            }
             base.OnFormClosing(e);
       
         }
